@@ -4,7 +4,7 @@
 
 #functions
 
-function   Fill-Board-With-Symbol{
+function Fill-Board-With-Symbol{
 
 param(
     [Parameter(Mandatory=$true)]
@@ -24,45 +24,6 @@ param(
             $board[$i,$j] = $symbol
              
         }
-    }
-}
-
-<#
-.Synopsis
-   Short description
-.DESCRIPTION
-   Long description
-.EXAMPLE
-   Example of how to use this cmdlet
-.EXAMPLE
-   Another example of how to use this cmdlet
-#>
-function Verb-Noun
-{
-    [CmdletBinding()]
-    [Alias()]
-    [OutputType([int])]
-    Param
-    (
-        # Param1 help description
-        [Parameter(Mandatory=$true,
-                   ValueFromPipelineByPropertyName=$true,
-                   Position=0)]
-        $Param1,
-
-        # Param2 help description
-        [int]
-        $Param2
-    )
-
-    Begin
-    {
-    }
-    Process
-    {
-    }
-    End
-    {
     }
 }
 
@@ -163,6 +124,30 @@ param(
 }
 
 
+function Disclose-All-Mines {
+param(
+    [Parameter(Mandatory=$true)]
+    [char[,]]$playerBoard,
+
+    [Parameter(Mandatory=$true)]
+    [char[,]]$computerBoard,
+
+    [Parameter(Mandatory=$true)]
+    [int]$boardSize
+)
+
+    for ($i = 0 ; $i -lt $boardSize; $i++) {
+        for ($j = 0; $j -lt $boardSize; $j++) {
+
+            if ($computerBoard[$i,$j] -eq 'X') {
+                Update-Board -board $playerBoard -symbol 'X' -xPoint $i -yPoint $j        
+            }
+        
+        }
+    }
+}
+
+
 function Start-Game {
 
 param(
@@ -196,6 +181,11 @@ param(
             Update-Board -board $playerBoard -symbol $computerBoard[$x,$y] -xPoint $x -yPoint $y
         } else {
             Write-Host "game over :("
+
+            Disclose-All-Mines -playerBoard $playerBoard -computerBoard $computerBoard -boardSize $size
+
+            Print-Board -board $playerBoard -dimension $size 
+
             break
         }
     }
@@ -224,9 +214,7 @@ Fill-Board-With-Symbol -board $computerBoard -symbol '0' -boardSize $size
 Place-Mines -board $computerBoard  -boardSize $size
 
 
-
-#Print-Board -dimension $size -board $computerBoard
-
+#Print-Board -dimension $size -board $playerBoard
 
 
 Start-Game -playerBoard $playerBoard -computerBoard $computerBoard -boardSize $size
