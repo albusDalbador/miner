@@ -4,6 +4,22 @@
 
 #functions
 
+function Is-Valid {
+param(
+    [Parameter(Mandatory=$true)]
+    [int]$boardSize,
+
+    [Parameter(Mandatory=$true)]
+    [int]$x,
+
+    [Parameter(Mandatory=$true)]
+    [int]$y
+)
+    ( ($x -lt $boardSize) -and ($x -ge 0) ) -and ( ($y -lt $boardSize) -and ($y -ge 0) )  
+
+}
+
+
 function Fill-Board-With-Symbol{
 
 param(
@@ -37,7 +53,7 @@ param(
     [Parameter(Mandatory=$true)]
     [int]$dimension
 )
-    Write-Host -NoNewline "   "
+    Write-Host -NoNewline " \Y "
 
     for ($i=0; $i -lt $dimension; $i++) {
         Write-Host -NoNewline "${i}  "
@@ -45,7 +61,7 @@ param(
 
     Write-Host ""
 
-    Write-Host -NoNewline "  "
+    Write-Host -NoNewline "X\ "
 
     for ($i=0; $i -lt $dimension; $i++) {
         Write-Host -NoNewline "___"
@@ -56,7 +72,7 @@ param(
 
     for ($i=0; $i -lt $dimension; $i++) {
         
-        Write-Host -NoNewline "${i}| "
+        Write-Host -NoNewline "${i} | "
 
         for ($j=0; $j -lt $dimension; $j++) {
 
@@ -148,6 +164,113 @@ param(
 }
 
 
+function Count-Nearest-Mines {
+
+param(
+    [Parameter(Mandatory=$true)]
+    [char[,]]$board,
+
+    [Parameter(Mandatory=$true)]
+    [int]$boardSize,
+
+    [Parameter(Mandatory=$true)]
+    [int]$xPoint,
+
+    [Parameter(Mandatory=$true)]
+    [int]$yPoint
+)
+
+    [int]$count =0;
+
+    for ($i=$xPoint-1; $i -le $xPoint +1; $i++) {
+        for ($j = $yPoint -1 ; $j -le $yPoint + 1; $j++) {
+            
+            if (Is-Valid -x $i -y $j -boardSize $boardSize) {
+                if ($board[$i,$j] -eq 'X') {
+                    $count++
+                }
+            }
+        }
+    }
+
+    $count
+}
+
+
+function Place-Numbers-On-Board {
+
+param(
+    [Parameter(Mandatory=$true)]
+    [char[,]]$board,
+
+    [Parameter(Mandatory=$true)]
+    [int]$boardSize
+)
+
+    for ($i=0; $i -lt $boardSize; $i++) {
+        for ($j = 0 ; $j -lt $boardSize; $j++) {
+            if ($board[$i,$j] -ne 'X') {
+
+                $board[$i,$j] = [string](Count-Nearest-Mines -board $board -boardSize $boardSize -xPoint $i -yPoint $j)
+            }
+        }
+    }
+}
+
+
+function Disclose-Free-Neighbours {
+
+param(
+    [Parameter(Mandatory=$true)]
+    [char[,]]$playerBoard,
+
+    [Parameter(Mandatory=$true)]
+    [char[,]]$computerBoard,
+
+    [Parameter(Mandatory=$true)]
+    [int]$boardSize,
+
+    [Parameter(Mandatory=$true)]
+    [int]$xPoint,
+
+    [Parameter(Mandatory=$true)]
+    [int]$yPoint
+)
+
+    
+    Update-Board -board $playerBoard -symbol $computerBoard[$xPoint,$yPoint] -xPoint $xPoint -yPoint $yPoint
+
+    if ($computerBoard[$xPoint,$yPoint] -eq '0') {
+     
+        if (Is-Valid -boardSize $boardSize -x ($xPoint - 1) -y $yPoint) {
+            if ($playerBoard[($xPoint -1),$yPoint] -ne $computerBoard[($xPoint -1),$yPoint]) {
+                Disclose-Free-Neighbours -playerBoard $playerBoard -computerBoard $computerBoard -boardSize $boardSize -xPoint ($xPoint -1) -yPoint $yPoint
+            }
+        }
+
+        if (Is-Valid -boardSize $boardSize -x ($xPoint + 1) -y $yPoint) {
+            if ($playerBoard[($xPoint +1),$yPoint] -ne $computerBoard[($xPoint +1),$yPoint]) {
+                Disclose-Free-Neighbours -playerBoard $playerBoard -computerBoard $computerBoard -boardSize $boardSize -xPoint ($xPoint +1) -yPoint $yPoint
+            }
+        }
+
+        if (Is-Valid -boardSize $boardSize -x $xPoint -y ($yPoint - 1)) {
+            if ($playerBoard[$xPoint,($yPoint - 1)] -ne $computerBoard[$xPoint,($yPoint - 1)]) {
+                Disclose-Free-Neighbours -playerBoard $playerBoard -computerBoard $computerBoard -boardSize $boardSize -xPoint $xPoint -yPoint ($yPoint - 1)
+            }
+        }
+
+        if (Is-Valid -boardSize $boardSize -x $xPoint -y ($yPoint + 1)) {
+            if ($playerBoard[$xPoint,($yPoint + 1)] -ne $computerBoard[$xPoint,($yPoint + 1)]) {
+                Disclose-Free-Neighbours -playerBoard $playerBoard -computerBoard $computerBoard -boardSize $boardSize -xPoint $xPoint -yPoint ($yPoint + 1)
+            }
+        }
+
+    }
+
+}
+
+
 function Start-Game {
 
 param(
@@ -165,6 +288,9 @@ param(
 
     while ($true) {
 
+        clear
+        #for debug
+
         Print-Board -board $playerBoard -dimension $boardSize
 
         do {
@@ -178,9 +304,15 @@ param(
         while( ($y -ge $boardSize) -or ($y -lt 0) )  
 
         if ($computerBoard[$x,$y] -ne 'X') {
-            Update-Board -board $playerBoard -symbol $computerBoard[$x,$y] -xPoint $x -yPoint $y
+
+            Disclose-Free-Neighbours -playerBoard $playerBoard -computerBoard $computerBoard -boardSize $boardSize -xPoint $x -yPoint $y
+            #Update-Board -board $playerBoard -symbol $computerBoard[$x,$y] -xPoint $x -yPoint $y
+
         } else {
-            Write-Host "game over :("
+
+            clear
+
+            Write-Host "GAME OVER :("
 
             Disclose-All-Mines -playerBoard $playerBoard -computerBoard $computerBoard -boardSize $size
 
@@ -213,9 +345,9 @@ Fill-Board-With-Symbol -board $computerBoard -symbol '0' -boardSize $size
 
 Place-Mines -board $computerBoard  -boardSize $size
 
+Place-Numbers-On-Board -board $computerBoard -boardSize $size
 
-#Print-Board -dimension $size -board $playerBoard
-
+Print-Board -dimension $size -board $computerBoard
 
 Start-Game -playerBoard $playerBoard -computerBoard $computerBoard -boardSize $size
 
