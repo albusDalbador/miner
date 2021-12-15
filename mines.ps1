@@ -326,6 +326,19 @@ param(
 }
 
 
+function End-Game-Write-Result {
+    [CmdletBinding()]
+    param(
+        [Parameter(
+            Mandatory=$true,
+            Position=1,
+            HelpMessage="Do you want to save your result [n]/[y]?"
+        )]
+        [string]$response
+    )
+    
+}
+
 #end of functions
 
 
@@ -347,9 +360,11 @@ Place-Mines -board $computerBoard  -boardSize $size
 
 Place-Numbers-On-Board -board $computerBoard -boardSize $size
 
-Print-Board -dimension $size -board $computerBoard
+#Print-Board -dimension $size -board $computerBoard
 
-Start-Game -playerBoard $playerBoard -computerBoard $computerBoard -boardSize $size
+#Start-Game -playerBoard $playerBoard -computerBoard $computerBoard -boardSize $size
+
+End-Game-Write-Result
 
 
 #end of 'main'
