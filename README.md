@@ -9,6 +9,9 @@ This is how it looks:
     <img align="center" src="gameplay.png" style="vertical-align: top;" />
 </div>
  
+ <div align="center">    
+-------------------------------------------------------------------------------------------------
+</div>
 
 <div align="center">
     <img align="center" src="endgame.png" style="vertical-align: top;" />
