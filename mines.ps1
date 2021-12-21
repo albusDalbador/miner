@@ -343,7 +343,8 @@ function End-Game-Write-Result {
 
         #Write-Host $date
 
-         if (Test-Path -Path $PSBoundParameters.filename) {
+         if ($PSBoundParameters.filename) {
+            if (Test-Path -Path $PSBoundParameters.filename) {
             Write-Host "given file exist, result will added to file content"
 
             if ($gameResult -eq "LOST") {
@@ -354,23 +355,28 @@ function End-Game-Write-Result {
                  | Out-File $PSBoundParameters.filename -Append
             }
          
-         } else {
-            Write-Host "Creating file" $PSBoundParameters.filename "..."
+             } else {
+                Write-Host "Creating file" $PSBoundParameters.filename "..."
 
-            if ($gameResult -eq "LOST") {
-                echo "$date  game result: $gameResult fields remained: $fieldsLeft board size: $boardSize  total mines: $minesOnBoard"`
-                 | Out-File $PSBoundParameters.filename -Append
-            } else {
-                echo "$date  $gameResult  board size: $boardSize  total mines: $minesOnBoard"`
-                 | Out-File $PSBoundParameters.filename -Append
-            }
+                if ($gameResult -eq "LOST") {
+                    echo "$date  game result: $gameResult fields remained: $fieldsLeft board size: $boardSize  total mines: $minesOnBoard"`
+                     | Out-File $PSBoundParameters.filename -Append
+                } else {
+                    echo "$date  $gameResult  board size: $boardSize  total mines: $minesOnBoard"`
+                     | Out-File $PSBoundParameters.filename -Append
+                }
          }
 
-         if ($?) {
-            Write-Host "Result successfuly writted to file " $PSBoundParameters.filename
-         } else {
-            Write-Host "Something went wrong"
+            if ($?) {
+               Write-Host "Result successfuly writted to file " $PSBoundParameters.filename
+             } else {
+                Write-Host "Something went wrong"
+             }
          }
+
+
+
+         
 
     }
 }
@@ -405,7 +411,6 @@ param(
         Write-Host ($closedFields - $numberOfMines)
 
         Print-Board -board $playerBoard -dimension $boardSize
-        write-host $closedFields
 
         if ($closedFields -eq $numberOfMines) {
             Write-Host "Congratulations, you won!"
@@ -463,7 +468,7 @@ param(
 # 'main'
 
 #greetings
-Write-Output "welcome in mini minier :)"
+Write-Output "welcome to mines mini game"
 
 [int]$size = Read-Host "Please, enter the board size"
  
@@ -489,7 +494,6 @@ Start-Game -playerBoard $playerBoard -computerBoard $computerBoard -boardSize $s
 
 
 #end of 'main'
-
 
 
 
