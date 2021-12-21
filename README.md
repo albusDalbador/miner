@@ -6,6 +6,5 @@ This is how it looks:
 ![Screenshot](gameplay.png)
 ---------------------------------------
 
-<div align="center">
-    <img src="gameplay.png" style="vertical-align: top;" />
-</div>
+
+    <img align="center" src="gameplay.png" style="vertical-align: top;" />
