@@ -1,5 +1,5 @@
 # mines
-Project for powershell course zaliczenie
+Project for powershell course zaliczenie\n
 Simple mini game, similar to standard minesweeper
 This is how it looks:
 
