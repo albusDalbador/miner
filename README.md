@@ -1,6 +1,6 @@
 # mines
-Project for powershell course zaliczenie\n
-Simple mini game, similar to standard minesweeper
+Project for powershell course zaliczenie <br>
+Simple mini game, similar to standard minesweeper<br>
 This is how it looks:
 
  
